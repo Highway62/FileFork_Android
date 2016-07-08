@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    android:id="@+id/message_screen_container"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical"
+    tools:context="highway62.filefork.MessageScreenActivity">
+
+    <!-- Chat Window -->
+    <ListView
+        android:id="@+id/message_scr_chatWindow"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".90"
+        android:background="@color/dim_foreground_disabled_material_light"
+        android:clickable="true"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:focusableInTouchMode="true"
+        android:stackFromBottom="true">
+
+    </ListView>
+
+    <!-- Message Input Box -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".10"
+        android:background="@color/LightGrey"
+        android:orientation="horizontal">
+
+        <!-- Add File Button -->
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".10">
+
+            <ImageButton
+                android:id="@+id/message_scr_uploadBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:src="@android:drawable/ic_menu_upload"/>
+
+        </RelativeLayout>
+
+        <!-- Compose Message Box -->
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".80">
+
+            <EditText
+                android:id="@+id/message_scr_editText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:layout_margin="5dp"
+                android:background="@color/WhiteSmoke"
+                android:inputType="textMultiLine"
+                android:scrollbars="vertical"
+                />
+
+        </RelativeLayout>
+
+
+        <!-- Send Button -->
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".10">
+
+            <ImageButton
+                android:id="@+id/message_scr_sendBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:src="@android:drawable/ic_menu_send"/>
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+</LinearLayout>

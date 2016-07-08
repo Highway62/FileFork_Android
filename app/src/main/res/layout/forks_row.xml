@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginBottom="2dp"
+              android:background="#c4d5d5d5"
+              android:gravity="center_vertical"
+              android:orientation="horizontal">
+
+    <!-- android:layout_marginTop="5dp" -->
+
+    <!-- Fork Image -->
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight=".20">
+
+        <ImageView
+            android:id="@+id/forks_row_img"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center"
+            android:contentDescription="@string/Forks_Recipient_Icon"
+            android:src="@drawable/ic_action_forks"/>
+
+    </RelativeLayout>
+
+
+    <!-- Main Body of Row (Title and Summary) -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight=".60"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".70">
+
+            <TextView
+                android:id="@+id/forks_row_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:ellipsize="marquee"
+                android:fadingEdge="horizontal"
+                android:singleLine="true"
+                android:text="Testing Forks Row Title of a Chat"
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".30">
+
+            <TextView
+                android:id="@+id/forks_row_summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:text="FunnyImage.jpg"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="?android:attr/textColorHint"/>
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+    <!-- Time Stamp and Arrow -->
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight=".20"
+        android:paddingRight="?android:attr/scrollbarSize">
+
+        <TextView
+            android:id="@+id/fork_row_timestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:paddingRight="?android:attr/scrollbarSize"
+            android:text="14:57"
+            android:textColor="?android:attr/textColorHint"
+            android:textSize="12dp"/>
+
+        <ImageView
+            android:id="@+id/fork_row_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_forks_row_arrow"/>
+
+    </RelativeLayout>
+
+
+</LinearLayout>
