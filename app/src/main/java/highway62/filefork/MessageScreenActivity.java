@@ -4,9 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -18,8 +16,8 @@ import java.util.ArrayList;
 public class MessageScreenActivity extends AppCompatActivity {
 
     private InputMethodManager imm;
-    private long forkId;
     private Intent mInt;
+    private ForkDAO forkDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,33 +26,10 @@ public class MessageScreenActivity extends AppCompatActivity {
 
         imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         mInt = getIntent();
-        forkId = mInt.getLongExtra(Consts.FORK_ID, -1);
+        forkDao = new ForkDAO(this);
 
-        setupActionBar();
         setupKeyboardListeners();
         populateList();
-    }
-
-    private void setupActionBar(){
-        // Set up Action Bar
-        SpannableString s = new SpannableString(Consts.FORK_MSG_SCREEN_TITLE);
-        s.setSpan(new TypefaceSpan(this, Consts.FONT_ACTION_BAR), 0, s.length(),
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        s.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.Green)), 0, 1, 0);
-        s.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.Green)), 5, 6, 0);
-
-
-        //Update Action Bar Title with TypefaceSpan instance
-        try {
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setTitle(s);
-            } else {
-                throw new Exception("Error Setting Support Action Bar");
-            }
-        } catch (Exception e){
-            System.err.print(e.getMessage());
-        }
     }
 
     private void setupKeyboardListeners(){
@@ -86,11 +61,24 @@ public class MessageScreenActivity extends AppCompatActivity {
 
     private void populateList(){
 
+        long fork_id;
+
         if(mInt.hasExtra(Consts.FORK_MSGS)){
             ArrayList<Message> msgs = mInt.getParcelableArrayListExtra(Consts.FORK_MSGS);
             MessageScreenAdapter adapter = new MessageScreenAdapter(this,msgs,Consts.USER_ID);
             ListView msgList = (ListView) findViewById(R.id.message_scr_chatWindow);
             msgList.setAdapter(adapter);
+        }
+
+        if(mInt.hasExtra(Consts.FORK_ID)){
+            // Set fork name in action bar
+            fork_id = mInt.getLongExtra(Consts.FORK_ID, -1L);
+            if(fork_id != -1){
+                Fork f = forkDao.getFork(fork_id);
+                if(f != null){
+                    setupActionBar(f.getForkName());
+                }
+            }
         }
 
         /*
@@ -104,4 +92,17 @@ public class MessageScreenActivity extends AppCompatActivity {
         msgs.add(m3);*/
     }
 
+    private void setupActionBar(String name){
+        // Set up Action Bar with fork name
+        try {
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setTitle(name);
+            } else {
+                throw new Exception("Error Setting Support Action Bar");
+            }
+        } catch (Exception e){
+            Log.d("MSGSCREEN", e.getMessage());
+        }
+    }
 }

@@ -70,7 +70,7 @@ public class ContactDeviceDAO extends BaseDAO{
         }
     }
 
-    public Device getDeviceById(long id) throws Exception {
+    public Device getDeviceById(long id) {
 
         // Columns to return
         String[] projection = {
@@ -110,7 +110,7 @@ public class ContactDeviceDAO extends BaseDAO{
             if(!dev_type.equals(DBContract.DeviceTypes.CONTACT)){
                 return new Device(dev_id,dev_name,dev_type);
             } else {
-                throw new Exception("Supplied ID is of CONTACT, not DEVICE");
+                return null;
             }
         } else {
             return null;

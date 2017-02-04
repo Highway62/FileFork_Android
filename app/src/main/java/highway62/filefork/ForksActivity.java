@@ -103,16 +103,16 @@ public class ForksActivity extends AppCompatActivity{
         // Add some forks
         Fork f1 = new Fork(dev1.getDeviceName(), DBContract.ForkTypes.IPHONE, dev1Id);
         Fork f2 = new Fork(dev2.getDeviceName(), DBContract.ForkTypes.ANDROID, dev2Id);
-        Fork f3 = new Fork(dev3.getDeviceName(), DBContract.ForkTypes.WINDOWS, dev3Id);
+        //Fork f3 = new Fork(dev3.getDeviceName(), DBContract.ForkTypes.WINDOWS, dev3Id);
 
         long forkId1 = 0;
         long forkId2 = 0;
-        long forkId3 = 0;
+        //long forkId3 = 0;
 
         try {
             forkId1 = forkDAO.addFork(f1);
             forkId2 = forkDAO.addFork(f2);
-            forkId3 = forkDAO.addFork(f3);
+            //forkId3 = forkDAO.addFork(f3);
         } catch (Exception e) {
             Log.v("ForksActivityForks", e.getMessage());
         }
@@ -120,16 +120,16 @@ public class ForksActivity extends AppCompatActivity{
         // Update the last message and timestamp of the forks
         Message msg1 = new Message(forkId1,"testing message 1",null, DBContract.MessageTypes.TEXT, Consts.USER_ID,true,1333125342L);
         Message msg2 = new Message(forkId2,"testing message 2",null, DBContract.MessageTypes.TEXT, Consts.USER_ID,true,1334125342L);
-        Message msg3 = new Message(forkId3,"testing message 3",null, DBContract.MessageTypes.TEXT, dev1Id,true,1335125342L);
+        //Message msg3 = new Message(forkId3,"testing message 3",null, DBContract.MessageTypes.TEXT, dev1Id,true,1335125342L);
 
         MessageHandler mHandler = new MessageHandler(this);
         mHandler.addMessageToDb(msg1);
         mHandler.addMessageToDb(msg2);
-        mHandler.addMessageToDb(msg3);
+        //mHandler.addMessageToDb(msg3);
 
         forkDAO.updateLastMessage(forkId1, msg1);
         forkDAO.updateLastMessage(forkId2, msg2);
-        forkDAO.updateLastMessage(forkId3, msg3);
+        //forkDAO.updateLastMessage(forkId3, msg3);
 
         // Add all the forks to the layout
         refreshForks();
@@ -171,7 +171,6 @@ public class ForksActivity extends AppCompatActivity{
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings_btn) {
             return true;
         }
@@ -275,7 +274,7 @@ public class ForksActivity extends AppCompatActivity{
         });
     }
 
-    private void onRowSelected(int position){
+    private void onRowSelected(final int position){
         long fork_id = forks.get(position).getId();
         // Check if fork is newly created (id of -1), if so ask for recipient
         if(fork_id == -1){
@@ -284,12 +283,29 @@ public class ForksActivity extends AppCompatActivity{
             dialog.setDialogObserver(new DeviceDialog.DialogObserver() {
                 @Override
                 public void notifyResult(long device_id) {
-                    // Add new fork to DB
-                    //TODO check is device selected is already open, if so, switch to that fork without creating new one.
-                    long newForkId = ForksActivity.this.addNewFork(device_id);
-                    if(newForkId > -1) {
-                        // Launch new Fork's Message Screen
-                        ForksActivity.this.launchMessageScreen(newForkId);
+                    // Check if device is already open in fork. If so, switch to that
+                    boolean exists = false;
+                    long existingForkId = -1l;
+                    for(int i = 0; i < forks.size(); i++){
+                        Fork f = forks.get(i);
+                        if(f.getRecipient() == device_id){
+                            // Fork already created
+                            exists = true;
+                            existingForkId = f.getId();
+                            break;
+                        }
+                    }
+
+                    if(exists && existingForkId != -1){
+                        launchMessageScreen(existingForkId);
+                    }else{
+                        // New Fork
+                        long newforkId = addNewForkToDb(device_id, position);
+                        if(newforkId != -1L){
+                            launchMessageScreen(newforkId);
+                        }else{
+                            Log.d("FORKSCREEN", "Error adding fork to DB from message screen");
+                        }
                     }
                 }
             });
@@ -300,9 +316,23 @@ public class ForksActivity extends AppCompatActivity{
         }
     }
 
-    private long addNewFork(long device_id){
-        //TODO You need to get the row position of the fork that was clicked on and update it so it doesn't say "add new recipient" anymore
-        return 0;
+    private long addNewForkToDb(long device_id, int position){
+        long newForkId = -1;
+        Fork f = forks.get(position);
+        Device d = contactDeviceDAO.getDeviceById(device_id);
+        if(f != null && d != null){
+            // Set fork name to device name
+            f.setForkName(d.getDeviceName());
+            f.setForkType(d.getDeviceType());
+            // Set blank last message for summary
+            f.setLastMsg("");
+            try {
+                newForkId = forkDAO.addFork(f);
+            } catch (Exception e) {
+                Log.d("FORKSCREEN", e.getMessage());
+            }
+        }
+        return newForkId;
     }
 
     private void launchMessageScreen(long forkId){
@@ -335,4 +365,6 @@ public class ForksActivity extends AppCompatActivity{
         return timestamp;
     }
 
+    // TODO change onPause(?) or onResume(?) so that when back is pressed from the message screen, or the screen is reloaded...
+    // Then the fork list is refreshed from the database.
 }

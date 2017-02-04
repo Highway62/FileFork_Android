@@ -84,9 +84,9 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:paddingRight="?android:attr/scrollbarSize"
-            android:text="14:57"
             android:textColor="?android:attr/textColorHint"
-            android:textSize="12dp"/>
+            android:textSize="12dp"
+            android:text="00:00"/>
 
         <ImageView
             android:id="@+id/fork_row_arrow"
