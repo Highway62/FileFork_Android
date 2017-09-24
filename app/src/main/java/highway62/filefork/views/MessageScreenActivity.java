@@ -1,4 +1,4 @@
-package highway62.filefork;
+package highway62.filefork.views;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,8 +13,16 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
-public class MessageScreenActivity extends AppCompatActivity {
+import highway62.filefork.R;
+import highway62.filefork.model.Consts;
+import highway62.filefork.model.daos.ForkDAO;
+import highway62.filefork.objects.Fork;
+import highway62.filefork.objects.Message;
+import highway62.filefork.presenters.MessagePresenter;
 
+public class MessageScreenActivity extends AppCompatActivity implements MessageNotifier {
+
+    private MessagePresenter presenter;
     private InputMethodManager imm;
     private Intent mInt;
     private ForkDAO forkDao;
@@ -32,29 +40,35 @@ public class MessageScreenActivity extends AppCompatActivity {
         populateList();
     }
 
+    /* Listens for touches to the screen which hide the keyboard */
     private void setupKeyboardListeners(){
 
         EditText editText = (EditText) findViewById(R.id.message_scr_editText);
         ListView chatWindow = (ListView) findViewById(R.id.message_scr_chatWindow);
-        chatWindow.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                hideKeyboard(v);
-                return true;
-            }
-        });
+        if(chatWindow != null) {
+            chatWindow.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    hideKeyboard(v);
+                    return true;
+                }
+            });
+        }
 
         // Listen for change to focus of EditText
-        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    hideKeyboard(v);
+        if(editText != null) {
+            editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if (!hasFocus) {
+                        hideKeyboard(v);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
+    /* Hides the keyboard if focus is lost */
     private void hideKeyboard(View view) {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
@@ -67,7 +81,9 @@ public class MessageScreenActivity extends AppCompatActivity {
             ArrayList<Message> msgs = mInt.getParcelableArrayListExtra(Consts.FORK_MSGS);
             MessageScreenAdapter adapter = new MessageScreenAdapter(this,msgs,Consts.USER_ID);
             ListView msgList = (ListView) findViewById(R.id.message_scr_chatWindow);
-            msgList.setAdapter(adapter);
+            if(msgList != null){
+                msgList.setAdapter(adapter);
+            }
         }
 
         if(mInt.hasExtra(Consts.FORK_ID)){
@@ -92,8 +108,8 @@ public class MessageScreenActivity extends AppCompatActivity {
         msgs.add(m3);*/
     }
 
+    /* Set up ActionBar with fork name */
     private void setupActionBar(String name){
-        // Set up Action Bar with fork name
         try {
             ActionBar actionBar = getSupportActionBar();
             if (actionBar != null) {
@@ -104,5 +120,17 @@ public class MessageScreenActivity extends AppCompatActivity {
         } catch (Exception e){
             Log.d("MSGSCREEN", e.getMessage());
         }
+    }
+
+    /* Receives message from the presenter */
+    @Override
+    public void passMessage(Message msg) {
+
+    }
+
+    /* Receives list of messages from the presenter */
+    @Override
+    public void passMessageList(ArrayList<Message> msgList) {
+
     }
 }

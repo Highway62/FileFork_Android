@@ -1,4 +1,4 @@
-package highway62.filefork;
+package highway62.filefork.objects;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -19,7 +19,7 @@ public class Message implements Parcelable {
     /**
      * Constructor for entry  to the db
      */
-    public Message(long forkId, String text, String file, String type, long sender_id, boolean sent, long timeStamp) {
+    private Message(long forkId, String text, String file, String type, long sender_id, boolean sent, long timeStamp) {
         this.forkId = forkId;
         this.text = text;
         this.file = file;
@@ -30,9 +30,16 @@ public class Message implements Parcelable {
     }
 
     /**
+     * Static factory method for messages intended for the entry into the DB
+     */
+    public static Message newEntryMessage(long forkId, String text, String file, String type, long sender_id, boolean sent, long timeStamp){
+        return new Message(forkId,text,file,type,sender_id,sent,timeStamp);
+    }
+
+    /**
      * Constructor for retrieval from the db
      */
-    public Message(long id, long forkId, String text, String file, String type, long sender_id, boolean sent, long timeStamp) {
+    private Message(long id, long forkId, String text, String file, String type, long sender_id, boolean sent, long timeStamp) {
         this.id = id;
         this.forkId = forkId;
         this.text = text;
@@ -41,6 +48,13 @@ public class Message implements Parcelable {
         this.sender_id = sender_id;
         this.sent = sent;
         this.timeStamp = timeStamp;
+    }
+
+    /**
+     * Static factory method for messages being retrieved by the DB
+     */
+    public static Message newRetrievalMessage(long id, long forkId, String text, String file, String type, long sender_id, boolean sent, long timeStamp){
+        return new Message(id,forkId,text,file,type,sender_id,sent,timeStamp);
     }
 
     public long getId() {

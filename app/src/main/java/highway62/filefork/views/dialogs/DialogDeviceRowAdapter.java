@@ -1,4 +1,4 @@
-package highway62.filefork;
+package highway62.filefork.views.dialogs;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,6 +9,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+
+import highway62.filefork.R;
+import highway62.filefork.objects.Device;
 
 /**
  * Created by Highway62 on 07/07/2016.

@@ -1,4 +1,4 @@
-package highway62.filefork;
+package highway62.filefork.views;
 
 import android.content.Context;
 import android.text.Spannable;
@@ -12,6 +12,11 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import highway62.filefork.R;
+import highway62.filefork.objects.Fork;
+import highway62.filefork.views.typefaces.TypefaceSpan;
+import highway62.filefork.model.Consts;
 
 /**
  * Created by Steven on 08/09/2015.

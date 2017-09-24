@@ -1,4 +1,4 @@
-package highway62.filefork;
+package highway62.filefork.views.dialogs;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -8,6 +8,11 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+
+import highway62.filefork.R;
+import highway62.filefork.model.daos.ContactDeviceDAO;
+import highway62.filefork.objects.Contact;
+import highway62.filefork.objects.Device;
 
 /**
  * Created by Highway62 on 07/07/2016.
@@ -44,8 +49,8 @@ public class DeviceDialog extends Dialog {
             deviceList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    // Return the device ID to the fork activity
-                    mDialogObserver.notifyResult(DeviceDialog.this.devices.get(position).getId());
+                    // Return the device to the fork activity
+                    mDialogObserver.notifyResultDevice(DeviceDialog.this.devices.get(position));
                 }
             });
         }
@@ -56,7 +61,7 @@ public class DeviceDialog extends Dialog {
             contactList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    mDialogObserver.notifyResult(DeviceDialog.this.contacts.get(position).getId());
+                    mDialogObserver.notifyResultContact(DeviceDialog.this.contacts.get(position));
                 }
             });
         }
@@ -73,7 +78,8 @@ public class DeviceDialog extends Dialog {
     }
 
     public interface DialogObserver{
-        void notifyResult(long device_id);
+        void notifyResultDevice(Device device);
+        void notifyResultContact(Contact contact);
     }
 
     private void freeReferences(){

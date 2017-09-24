@@ -1,4 +1,4 @@
-package highway62.filefork;
+package highway62.filefork.model.daos;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,13 +7,16 @@ import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
 
+import highway62.filefork.objects.Message;
+import highway62.filefork.model.DBContract;
+
 /**
  * Created by Steven on 30/09/2015.
  */
-public class MessageDAO extends BaseDAO{
+public class MessageDAO extends BaseDAO {
 
     public MessageDAO(Context context) {
-        super(context, DBContract.DB_NAME, null, DBContract.DB_VERSION);
+        super(context);
     }
 
     public long addMessage(Message msg) throws Exception {
@@ -28,9 +31,9 @@ public class MessageDAO extends BaseDAO{
         values.put(DBContract.MessagesTable.COLUMN_SENT, msgSent);
         values.put(DBContract.MessagesTable.COLUMN_TIMESTAMP, msg.getTimeStamp());
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = openDb();
         long rowId = db.insert(DBContract.MessagesTable.TABLE_NAME, null, values);
-        db.close();
+        closeDb();
 
         if (!(rowId > 0)) {
             throw new Exception("Error inserting fork into Android DB");
@@ -60,7 +63,7 @@ public class MessageDAO extends BaseDAO{
                 String.valueOf(msg_id)
         };
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = openDb();
 
         Cursor cursor = db.query(
                 DBContract.MessagesTable.TABLE_NAME,
@@ -81,10 +84,10 @@ public class MessageDAO extends BaseDAO{
             boolean sent = (cursor.getInt(cursor.getColumnIndexOrThrow(DBContract.MessagesTable.COLUMN_SENT)) == 1);
             Long timestamp = cursor.getLong(cursor.getColumnIndexOrThrow(DBContract.MessagesTable.COLUMN_TIMESTAMP));
             cursor.close();
-            db.close();
-            return new Message(msg_id,fork_id,text,file,type,sender_id,sent,timestamp);
+            closeDb();
+            return Message.newRetrievalMessage(msg_id,fork_id,text,file,type,sender_id,sent,timestamp);
         } else {
-            db.close();
+            closeDb();
             return null;
         }
     }
@@ -113,7 +116,7 @@ public class MessageDAO extends BaseDAO{
                 String.valueOf(fork_id)
         };
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = openDb();
 
         Cursor cursor = db.query(
                 DBContract.MessagesTable.TABLE_NAME,
@@ -126,7 +129,6 @@ public class MessageDAO extends BaseDAO{
 
         if(cursor.moveToFirst()){
             do {
-
                 long msg_id = cursor.getLong(cursor.getColumnIndexOrThrow(DBContract.MessagesTable._ID));
                 String text = cursor.getString(cursor.getColumnIndexOrThrow(DBContract.MessagesTable.COLUMN_TEXT));
                 String file = cursor.getString(cursor.getColumnIndexOrThrow(DBContract.MessagesTable.COLUMN_FILE));
@@ -134,33 +136,33 @@ public class MessageDAO extends BaseDAO{
                 long sender_id = cursor.getLong(cursor.getColumnIndexOrThrow(DBContract.MessagesTable.COLUMN_SENDER_ID));
                 boolean sent = (cursor.getInt(cursor.getColumnIndexOrThrow(DBContract.MessagesTable.COLUMN_SENT)) == 1);
                 Long timestamp = cursor.getLong(cursor.getColumnIndexOrThrow(DBContract.MessagesTable.COLUMN_TIMESTAMP));
-                messages.add(new Message(msg_id,fork_id,text,file,type,sender_id,sent,timestamp));
+                messages.add(Message.newRetrievalMessage(msg_id,fork_id,text,file,type,sender_id,sent,timestamp));
 
             }while (cursor.moveToNext());
             cursor.close();
-            db.close();
+            closeDb();
             return messages;
         } else {
-            db.close();
+            closeDb();
             return null;
         }
     }
 
     public int deleteMessage(long msg_id){
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = openDb();
         String selection = DBContract.MessagesTable._ID + "=?";
         String[] selectionArgs = { String.valueOf(msg_id) };
         int rowsAffected = db.delete(DBContract.MessagesTable.TABLE_NAME, selection, selectionArgs);
-        db.close();
+        closeDb();
         return rowsAffected;
     }
 
     public int deleteAllMessages(long fork_id){
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = openDb();
         String selection = DBContract.MessagesTable.COLUMN_FORK_ID + "=?";
         String[] selectionArgs = { String.valueOf(fork_id) };
         int rowsAffected = db.delete(DBContract.MessagesTable.TABLE_NAME, selection, selectionArgs);
-        db.close();
+        closeDb();
         return rowsAffected;
     }
 }

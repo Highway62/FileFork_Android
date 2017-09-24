@@ -2,7 +2,7 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="fill_parent"
              android:layout_height="match_parent"
-             tools:context=".ForksActivity">
+             tools:context=".views.ForksActivity">
 
     <ImageView
         android:id="@+id/bg_forks"
@@ -11,6 +11,14 @@
         android:layout_gravity="center"
         android:contentDescription="Forks Bg Image"
         android:src="@drawable/ic_bg_forks"/>
+
+    <ProgressBar
+        android:id="@+id/forkLoadingSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_gravity="center"/>
 
     <com.reginald.swiperefresh.CustomSwipeRefreshLayout
         android:id="@+id/swipelayout"

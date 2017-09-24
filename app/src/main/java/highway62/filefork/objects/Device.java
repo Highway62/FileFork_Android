@@ -1,4 +1,4 @@
-package highway62.filefork;
+package highway62.filefork.objects;
 
 public class Device {
 
@@ -6,10 +6,17 @@ public class Device {
     private String deviceName;
     private String deviceType;      // ANDROID, IPHONE etc
 
-    public Device(long id, String deviceName, String deviceType) {
+    private Device(long id, String deviceName, String deviceType) {
         this.id = id;
         this.deviceName = deviceName;
         this.deviceType = deviceType;
+    }
+
+    /**
+     * Static factory method to return a new device instance
+     */
+    public static Device newDevice(long id, String deviceName, String deviceType){
+        return new Device(id,deviceName,deviceType);
     }
 
     public long getId() {

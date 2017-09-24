@@ -1,4 +1,4 @@
-package highway62.filefork;
+package highway62.filefork.objects;
 
 /**
  * Created by Steven on 12/09/2015.
@@ -15,8 +15,12 @@ public class Fork {
     Long lastMsgTime;
     String lastMsgType;
 
-    public Fork(){
+    private Fork(){
         this.id = -1;
+    }
+
+    public static Fork newEmptyFork(){
+        return new Fork();
     }
 
     /**
@@ -26,16 +30,20 @@ public class Fork {
      * @param forkType
      * @param recipient
      */
-    public Fork(String forkName, String forkType, long recipient) {
+    private Fork(String forkName, String forkType, long recipient) {
         this.forkName = forkName;
         this.forkType = forkType;
         this.recipient = recipient;
     }
 
+    public static Fork newFork(String forkName, String forkType, long recipient){
+        return new Fork(forkName,forkType,recipient);
+    }
+
     /**
      * Constructor for object to hold data from the database (where id is known)
      */
-    public Fork(long id, String forkName, String forkType, long recipient, String lastMsg, Long lastMsgTime, String lastMsgType) {
+    private Fork(long id, String forkName, String forkType, long recipient, String lastMsg, Long lastMsgTime, String lastMsgType) {
         this.id = id;
         this.forkName = forkName;
         this.forkType = forkType;
@@ -43,6 +51,10 @@ public class Fork {
         this.lastMsg = lastMsg;
         this.lastMsgTime = lastMsgTime;
         this.lastMsgType = lastMsgType;
+    }
+
+    public static Fork newForkFromDatabase(long id, String forkName, String forkType, long recipient, String lastMsg, Long lastMsgTime, String lastMsgType){
+        return new Fork(id,forkName,forkType,recipient,lastMsg,lastMsgTime,lastMsgType);
     }
 
     public long getId() {

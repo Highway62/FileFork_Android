@@ -1,4 +1,4 @@
-package highway62.filefork;
+package highway62.filefork.model.daos;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,10 +7,14 @@ import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
 
+import highway62.filefork.objects.Fork;
+import highway62.filefork.objects.Message;
+import highway62.filefork.model.DBContract;
+
 public class ForkDAO extends BaseDAO {
 
     public ForkDAO(Context context) {
-        super(context, DBContract.DB_NAME, null, DBContract.DB_VERSION);
+        super(context);
     }
 
     public long addFork(Fork fork) throws Exception {
@@ -22,11 +26,11 @@ public class ForkDAO extends BaseDAO {
         values.putNull(DBContract.ForkTable.COLUMN_LAST_MSG_TYPE);
         values.putNull(DBContract.ForkTable.COLUMN_LAST_MSG_TIME);
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = openDb();
         long forkId = db.insert(DBContract.ForkTable.TABLE_NAME, null, values);
 
         if (forkId < 0) {
-            db.close();
+            closeDb();
             throw new Exception("Error inserting fork into Android DB");
         }else{
             // Add fork recipient to ForkRecipients table
@@ -34,7 +38,7 @@ public class ForkDAO extends BaseDAO {
             recipValues.put(DBContract.ForkRecipientsTable.COLUMN_FORK_ID, forkId);
             recipValues.put(DBContract.ForkRecipientsTable.COLUMN_RECIPIENT_ID, fork.getRecipient());
             long recipId = db.insert(DBContract.ForkRecipientsTable.TABLE_NAME, null, recipValues);
-            db.close();
+            closeDb();
             if(recipId < 0){
                 throw new Exception("Error adding recipient to fork");
             }
@@ -62,8 +66,7 @@ public class ForkDAO extends BaseDAO {
                 String.valueOf(id)
         };
 
-
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = openDb();
 
         Cursor cursor = db.query(
                 DBContract.ForkTable.TABLE_NAME,
@@ -112,14 +115,14 @@ public class ForkDAO extends BaseDAO {
                 recip_cursor.moveToFirst();
                 Long fork_recipient_id = recip_cursor.getLong(recip_cursor.getColumnIndexOrThrow(DBContract.ForkRecipientsTable.COLUMN_RECIPIENT_ID));
                 recip_cursor.close();
-                db.close();
-                return new Fork(fork_id,fork_name,fork_type,fork_recipient_id,lastMsg,lastMsgTime, lastMsgtype);
+                closeDb();
+                return Fork.newForkFromDatabase(fork_id,fork_name,fork_type,fork_recipient_id,lastMsg,lastMsgTime, lastMsgtype);
             } else {
-                db.close();
+                closeDb();
                 return null;
             }
         } else {
-            db.close();
+            closeDb();
             return null;
         }
     }
@@ -138,7 +141,7 @@ public class ForkDAO extends BaseDAO {
                 DBContract.ForkTable.COLUMN_LAST_MSG_TYPE
         };
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = openDb();
 
         Cursor cursor = db.query(
                 DBContract.ForkTable.TABLE_NAME,
@@ -182,38 +185,39 @@ public class ForkDAO extends BaseDAO {
                         null);          // order by
 
                 if(recip_cursor != null){
-                    recip_cursor.moveToFirst();
-                    int fork_recipient = recip_cursor.getInt(recip_cursor.getColumnIndexOrThrow(DBContract.ForkRecipientsTable.COLUMN_RECIPIENT_ID));
-                    recip_cursor.close();
-                    // If fork has recipient, then add to array
-                    forks.add(new Fork(fork_id,fork_name,fork_type,fork_recipient, lastMsg, lastMsgTime, lastMsgType));
+                    if(recip_cursor.moveToFirst()) {
+                        int fork_recipient = recip_cursor.getInt(recip_cursor.getColumnIndexOrThrow(DBContract.ForkRecipientsTable.COLUMN_RECIPIENT_ID));
+                        recip_cursor.close();
+                        // If fork has recipient, then add to array
+                        forks.add(Fork.newForkFromDatabase(fork_id, fork_name, fork_type, fork_recipient, lastMsg, lastMsgTime, lastMsgType));
+                    }
                 } else {
                     // If fork has no recipient, delete fork
                     deleteFork(fork_id);
                 }
             }while(cursor.moveToNext());
             cursor.close();
-            db.close();
+            closeDb();
         } else {
-            db.close();
+            closeDb();
             return null;
         }
         return forks;
     }
 
     public int deleteFork(long fork_id){
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = openDb();
         String selection = DBContract.ForkTable._ID + "=?";
         String[] selectionArgs = { String.valueOf(fork_id) };
 
         // delete row
         int noOfRows = db.delete(DBContract.ForkTable.TABLE_NAME, selection, selectionArgs);
-        db.close();
+        closeDb();
         return noOfRows;
     }
 
     public int updateLastMessage(long fork_id, Message msg){
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = openDb();
         String selection = DBContract.ForkTable._ID + "=?";
         String[] selectionArgs = { String.valueOf(fork_id) };
 
@@ -225,7 +229,23 @@ public class ForkDAO extends BaseDAO {
 
         // update row
         int noOfRows = db.update(DBContract.ForkTable.TABLE_NAME,values,selection,selectionArgs);
-        db.close();
+        closeDb();
         return noOfRows;
+    }
+
+    /* Checks whether a recipient (for a new fork) already exists in the DB */
+    public boolean recipientExists(long recip_id){
+        SQLiteDatabase db = openDb();
+        String query =
+                "SELECT 1 FROM " +
+                        DBContract.ForkRecipientsTable.TABLE_NAME +
+                        "WHERE" +
+                        DBContract.ForkRecipientsTable.COLUMN_RECIPIENT_ID + "=? LIMIT 1";
+        String[] selectionArgs = { String.valueOf(recip_id) };
+        Cursor cursor = db.rawQuery(query,selectionArgs);
+        boolean exists = (cursor.getCount() > 0);
+        cursor.close();
+        closeDb();
+        return exists;
     }
 }

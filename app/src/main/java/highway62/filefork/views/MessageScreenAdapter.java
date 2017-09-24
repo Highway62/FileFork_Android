@@ -1,4 +1,4 @@
-package highway62.filefork;
+package highway62.filefork.views;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -13,6 +13,10 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import highway62.filefork.R;
+import highway62.filefork.model.Consts;
+import highway62.filefork.objects.Message;
 
 /**
  * Created by Highway62 on 30/06/2016.

@@ -1,4 +1,4 @@
-package highway62.filefork;
+package highway62.filefork.model;
 
 /**
  * Created by Steven on 08/09/2015.

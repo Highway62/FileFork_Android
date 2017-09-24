@@ -1,4 +1,4 @@
-package highway62.filefork;
+package highway62.filefork.views;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
@@ -16,6 +16,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.reginald.swiperefresh.CustomSwipeRefreshLayout;
+
+import highway62.filefork.R;
 
 /**
  * Created by Highway62 on 01/06/2016.

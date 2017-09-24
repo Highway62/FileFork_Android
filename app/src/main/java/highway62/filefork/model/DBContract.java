@@ -1,5 +1,6 @@
-package highway62.filefork;
+package highway62.filefork.model;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 /**
@@ -9,8 +10,9 @@ import android.provider.BaseColumns;
  */
 public final class DBContract {
 
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 21;
     public static final String DB_NAME = "FileForkDB.db";
+    public static final SQLiteDatabase.CursorFactory DB_CURSOR_FACTORY  = null;
 
     // Tables
     // BaseColumns interface defines _ID and _COUNT column names
@@ -78,4 +80,48 @@ public final class DBContract {
         public static final String COLUMN_FORK_ID = "fork_id";
         public static final String COLUMN_RECIPIENT_ID = "recipient_id";
     }
+
+    // CREATE TABLE STRINGS
+
+    public static String CREATE_FORKS_TABLE =
+            "CREATE TABLE " + DBContract.ForkTable.TABLE_NAME
+                    + "("
+                    + DBContract.ForkTable._ID + " INTEGER PRIMARY KEY NOT NULL,"
+                    + DBContract.ForkTable.COLUMN_FORK_NAME + " TEXT NOT NULL,"
+                    + DBContract.ForkTable.COLUMN_FORK_TYPE + " TEXT NOT NULL,"
+                    + DBContract.ForkTable.COLUMN_LAST_MSG + " TEXT,"
+                    + DBContract.ForkTable.COLUMN_LAST_MSG_TIME + " INTEGER,"
+                    + DBContract.ForkTable.COLUMN_LAST_MSG_TYPE + " TEXT"
+                    + ")";
+
+    public static String CREATE_MESSAGES_TABLE =
+            "CREATE TABLE " + DBContract.MessagesTable.TABLE_NAME
+                    + "("
+                    + DBContract.MessagesTable._ID + " INTEGER PRIMARY KEY NOT NULL,"
+                    + DBContract.MessagesTable.COLUMN_FORK_ID + " INTEGER REFERENCES " + DBContract.ForkTable.TABLE_NAME + "(" + DBContract.ForkTable._ID + ") ON UPDATE CASCADE ON DELETE CASCADE,"
+                    + DBContract.MessagesTable.COLUMN_TEXT + " TEXT,"
+                    + DBContract.MessagesTable.COLUMN_FILE + " TEXT,"
+                    + DBContract.MessagesTable.COLUMN_TYPE + " TEXT NOT NULL,"
+                    + DBContract.MessagesTable.COLUMN_SENDER_ID + " INTEGER NOT NULL,"
+                    + DBContract.MessagesTable.COLUMN_SENT + " INTEGER DEFAULT 1,"
+                    + DBContract.MessagesTable.COLUMN_TIMESTAMP + " INTEGER NOT NULL"
+                    + ")";
+
+    public static String CREATE_DEVICES_TABLE =
+            "CREATE TABLE " + DBContract.ContactDevicesTable.TABLE_NAME
+                    + "("
+                    + DBContract.ContactDevicesTable._ID + " INTEGER PRIMARY KEY NOT NULL,"
+                    + DBContract.ContactDevicesTable.COLUMN_DEVICE_NAME + " TEXT NOT NULL,"
+                    + DBContract.ContactDevicesTable.COLUMN_DEVICE_TYPE + " TEXT NOT NULL,"
+                    + DBContract.ContactDevicesTable.COLUMN_ACCEPTED + " INTEGER DEFAULT 1"
+                    + ")";
+
+    public static String CREATE_FORK_RECIPIENTS_TABLE =
+            "CREATE TABLE " + DBContract.ForkRecipientsTable.TABLE_NAME
+                    + "("
+                    + DBContract.ForkRecipientsTable.COLUMN_FORK_ID + " INTEGER REFERENCES " + DBContract.ForkTable.TABLE_NAME + "(" + DBContract.ForkTable._ID + ") ON UPDATE CASCADE ON DELETE CASCADE,"
+                    + DBContract.ForkRecipientsTable.COLUMN_RECIPIENT_ID + " INTEGER REFERENCES " + DBContract.ContactDevicesTable.TABLE_NAME + "(" + DBContract.ContactDevicesTable._ID + ") ON UPDATE CASCADE ON DELETE CASCADE,"
+                    + " PRIMARY KEY" + "(" + DBContract.ForkRecipientsTable.COLUMN_FORK_ID + ", " + DBContract.ForkRecipientsTable.COLUMN_RECIPIENT_ID + ")"
+                    + ")";
+
 }

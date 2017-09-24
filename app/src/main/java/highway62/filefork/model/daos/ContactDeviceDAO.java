@@ -1,4 +1,4 @@
-package highway62.filefork;
+package highway62.filefork.model.daos;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,11 +7,15 @@ import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
 
+import highway62.filefork.objects.Contact;
+import highway62.filefork.model.DBContract;
+import highway62.filefork.objects.Device;
 
-public class ContactDeviceDAO extends BaseDAO{
+
+public class ContactDeviceDAO extends BaseDAO {
 
     public ContactDeviceDAO(Context context) {
-        super(context, DBContract.DB_NAME, null, DBContract.DB_VERSION);
+        super(context);
     }
 
     public long addDevice(Device device) throws Exception {
@@ -22,9 +26,9 @@ public class ContactDeviceDAO extends BaseDAO{
         values.put(DBContract.ContactDevicesTable.COLUMN_DEVICE_TYPE, device.getDeviceType());
         values.put(DBContract.ContactDevicesTable.COLUMN_ACCEPTED, 1);
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = openDb();
         long rowId = db.insert(DBContract.ContactDevicesTable.TABLE_NAME, null, values);
-        db.close();
+        closeDb();
 
         if (rowId <= 0) {
             throw new Exception("Error inserting device into Android DB");
@@ -41,9 +45,9 @@ public class ContactDeviceDAO extends BaseDAO{
         int isAccepted = contact.isAccepted() ? 1 : 0;
         values.put(DBContract.ContactDevicesTable.COLUMN_ACCEPTED, isAccepted);
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = openDb();
         long rowId = db.insert(DBContract.ContactDevicesTable.TABLE_NAME, null, values);
-        db.close();
+        closeDb();
 
         if (rowId <= 0) {
             throw new Exception("Error inserting contact into Android DB");
@@ -54,7 +58,6 @@ public class ContactDeviceDAO extends BaseDAO{
 
     public void updateContactAccepted(long contactId) throws Exception {
 
-        SQLiteDatabase db = this.getWritableDatabase();
         String selection = DBContract.ContactDevicesTable._ID + "=?";
         String[] selectionArgs = { String.valueOf(contactId) };
 
@@ -63,7 +66,9 @@ public class ContactDeviceDAO extends BaseDAO{
         values.put(DBContract.ContactDevicesTable.COLUMN_ACCEPTED,1);
 
         // update row
+        SQLiteDatabase db = openDb();
         int updatedRows = db.update(DBContract.ContactDevicesTable.TABLE_NAME,values,selection,selectionArgs);
+        closeDb();
 
         if(updatedRows == 0){
             throw new Exception("DB Error: Cannot Update Contact Accepted");
@@ -88,7 +93,7 @@ public class ContactDeviceDAO extends BaseDAO{
         };
 
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = openDb();
 
         Cursor cursor = db.query(
                 DBContract.ContactDevicesTable.TABLE_NAME,
@@ -105,14 +110,15 @@ public class ContactDeviceDAO extends BaseDAO{
             String dev_name = cursor.getString(cursor.getColumnIndexOrThrow(DBContract.ContactDevicesTable.COLUMN_DEVICE_NAME));
             String dev_type = cursor.getString(cursor.getColumnIndexOrThrow(DBContract.ContactDevicesTable.COLUMN_DEVICE_TYPE));
             cursor.close();
-            db.close();
+            closeDb();
 
             if(!dev_type.equals(DBContract.DeviceTypes.CONTACT)){
-                return new Device(dev_id,dev_name,dev_type);
+                return Device.newDevice(dev_id,dev_name,dev_type);
             } else {
                 return null;
             }
         } else {
+            closeDb();
             return null;
         }
     }
@@ -137,7 +143,7 @@ public class ContactDeviceDAO extends BaseDAO{
         };
 
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = openDb();
 
         Cursor cursor = db.query(
                 DBContract.ContactDevicesTable.TABLE_NAME,
@@ -153,12 +159,13 @@ public class ContactDeviceDAO extends BaseDAO{
                 long dev_id = cursor.getLong(cursor.getColumnIndexOrThrow(DBContract.ContactDevicesTable._ID));
                 String dev_name = cursor.getString(cursor.getColumnIndexOrThrow(DBContract.ContactDevicesTable.COLUMN_DEVICE_NAME));
                 String dev_type = cursor.getString(cursor.getColumnIndexOrThrow(DBContract.ContactDevicesTable.COLUMN_DEVICE_TYPE));
-                devices.add(new Device(dev_id,dev_name,dev_type));
+                devices.add(Device.newDevice(dev_id,dev_name,dev_type));
             }while(cursor.moveToNext());
             cursor.close();
-            db.close();
+            closeDb();
             return devices;
         } else {
+            closeDb();
             return null;
         }
     }
@@ -182,7 +189,7 @@ public class ContactDeviceDAO extends BaseDAO{
         };
 
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = openDb();
 
         Cursor cursor = db.query(
                 DBContract.ContactDevicesTable.TABLE_NAME,
@@ -201,14 +208,15 @@ public class ContactDeviceDAO extends BaseDAO{
             int con_accepted_int = cursor.getInt(cursor.getColumnIndexOrThrow(DBContract.ContactDevicesTable.COLUMN_ACCEPTED));
             boolean con_accepted = (con_accepted_int != 0);
             cursor.close();
-            db.close();
+            closeDb();
 
             if(con_type.equals(DBContract.DeviceTypes.CONTACT)){
-                return new Contact(con_id,con_name,con_accepted);
+                return Contact.newContact(con_id,con_name,con_accepted);
             } else {
                 throw new Exception("Supplied ID not a CONTACT");
             }
         } else {
+            closeDb();
             return null;
         }
     }
@@ -233,7 +241,7 @@ public class ContactDeviceDAO extends BaseDAO{
         };
 
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = openDb();
 
         Cursor cursor = db.query(
                 DBContract.ContactDevicesTable.TABLE_NAME,
@@ -250,10 +258,10 @@ public class ContactDeviceDAO extends BaseDAO{
                 String con_name = cursor.getString(cursor.getColumnIndexOrThrow(DBContract.ContactDevicesTable.COLUMN_DEVICE_NAME));
                 int con_accepted_int = cursor.getInt(cursor.getColumnIndexOrThrow(DBContract.ContactDevicesTable.COLUMN_ACCEPTED));
                 boolean con_accepted = (con_accepted_int != 0);
-                contacts.add(new Contact(con_id,con_name,con_accepted));
+                contacts.add(Contact.newContact(con_id,con_name,con_accepted));
             }while(cursor.moveToNext());
             cursor.close();
-            db.close();
+            closeDb();
             return contacts;
         } else {
             return null;

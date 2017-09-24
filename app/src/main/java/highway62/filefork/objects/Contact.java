@@ -1,4 +1,4 @@
-package highway62.filefork;
+package highway62.filefork.objects;
 
 /**
  * Created by Steven on 16/09/2015.
@@ -10,10 +10,17 @@ public class Contact {
     private final String contactType = "CONTACT";
     private boolean accepted;
 
-    public Contact(long id, String contactName, boolean accepted) {
+    private Contact(long id, String contactName, boolean accepted) {
         this.id = id;
         this.contactName = contactName;
         this.accepted = accepted;
+    }
+
+    /**
+     * Static factory method to return new Contact instance
+     */
+    public static Contact newContact(long id, String contactName, boolean accepted){
+        return new Contact(id,contactName,accepted);
     }
 
     public long getId() {
